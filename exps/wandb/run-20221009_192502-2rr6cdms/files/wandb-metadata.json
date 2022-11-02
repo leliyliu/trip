@@ -1,0 +1,35 @@
+{
+    "os": "Linux-5.15.0-47-generic-x86_64-with-glibc2.35",
+    "python": "3.9.13",
+    "heartbeatAt": "2022-10-09T11:25:04.653477",
+    "startedAt": "2022-10-09T11:25:02.269957",
+    "docker": null,
+    "gpu": "NVIDIA A100 80GB PCIe",
+    "gpu_count": 2,
+    "cpu_count": 64,
+    "cuda": null,
+    "args": [
+        "--datadir",
+        "/home/shared/cifar-10",
+        "--num_bits",
+        "8",
+        "--num_grad_bits",
+        "8",
+        "--experiment_name",
+        "trip_train_with_cifar",
+        "--scenario_name",
+        "basic-training"
+    ],
+    "state": "running",
+    "program": "/home/liulian/workplace/trip/exps/train_with_cifar.py",
+    "codePath": "exps/train_with_cifar.py",
+    "git": {
+        "remote": "git@github.com:leliyliu/trip.git",
+        "commit": "bf12a5253bd6dd6cd4afea4f2942ef81aaaf38eb"
+    },
+    "email": null,
+    "root": "/home/liulian/workplace/trip",
+    "host": "dell",
+    "username": "liulian",
+    "executable": "/home/liulian/miniconda3/envs/lptrain/bin/python"
+}

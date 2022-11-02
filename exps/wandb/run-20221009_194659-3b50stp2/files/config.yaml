@@ -1,0 +1,101 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.3
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.9.13
+    start_time: 1665316019.457671
+    t:
+      1:
+      - 1
+      - 41
+      - 55
+      2:
+      - 1
+      - 41
+      - 55
+      3:
+      - 1
+      - 13
+      - 16
+      - 23
+      4: 3.9.13
+      5: 0.13.3
+      8:
+      - 5
+arch:
+  desc: null
+  value: resnet20
+batch_size:
+  desc: null
+  value: 128
+cmd:
+  desc: null
+  value: train
+datadir:
+  desc: null
+  value: /home/shared/cifar-10
+dataset:
+  desc: null
+  value: cifar10
+debug:
+  desc: null
+  value: false
+dir:
+  desc: null
+  value: null
+epochs:
+  desc: null
+  value: 200
+experiment_name:
+  desc: null
+  value: basic_train_cifar_with_fp_weight
+lr:
+  desc: null
+  value: 0.1
+lr_schedule:
+  desc: null
+  value: piecewise
+momentum:
+  desc: null
+  value: 0.9
+num_bits:
+  desc: null
+  value: 8
+num_grad_bits:
+  desc: null
+  value: 8
+pretrained:
+  desc: null
+  value: false
+print_freq:
+  desc: null
+  value: 50
+project_name:
+  desc: null
+  value: trip
+resume:
+  desc: null
+  value: ''
+save_folder:
+  desc: null
+  value: save_checkpoints
+scenario_name:
+  desc: null
+  value: basic-training
+start_epoch:
+  desc: null
+  value: 0
+team_name:
+  desc: null
+  value: leliy-ict
+weight_decay:
+  desc: null
+  value: 0.0001
+workers:
+  desc: null
+  value: 4

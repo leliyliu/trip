@@ -1,0 +1,6 @@
+[submodule "codebase/niti"]
+	path = codebase/niti
+	url = git@github.com:wangmaolin/niti.git
+[submodule "codebase/fp_cifar"]
+	path = codebase/fp_cifar
+	url = git@github.com:akamaster/pytorch_resnet_cifar10.git
