@@ -31,54 +31,53 @@ rescaling_factor = 0.6
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='PyTorch CIFAR training in a fixed-point low-precision way!')
-    parser.add_argument("--team_name", type=str,  default='leliy-ict')
-    parser.add_argument("--project_name", type=str, default='trip')
-    parser.add_argument("--experiment_name", type=str, default='')
-    parser.add_argument("--scenario_name", type=str, default='')
-    parser.add_argument('--dir', help='annotate the working directory')
-    parser.add_argument('--cmd', choices=['train', 'test'], default='train')
+        description='PyTorch CIFAR training in a fixed-point low-precision way!')   # 参数概述
+    parser.add_argument("--team_name", type=str,  default='guobo22')                # wandb 队名
+    parser.add_argument("--project_name", type=str, default='trip')                 # wandb 项目名称
+    parser.add_argument("--experiment_name", type=str, default='')                  # wandb 实验名称
+    parser.add_argument("--scenario_name", type=str, default='')                    # wandb 组名
+    parser.add_argument('--dir', help='annotate the working directory')             # 指示工作文件夹？
+    parser.add_argument('--cmd', choices=['train', 'test'], default='train')        # 指定深度学习的功能，训练 or 测试
     parser.add_argument('--arch', metavar='ARCH', default='resnet20',
                         choices=model_names,
                         help='model architecture: ' +
                              ' | '.join(model_names) +
-                             ' (default: resnet20)')
+                             ' (default: resnet20)')                                # 指定采用的模型架构
     parser.add_argument('--dataset', '-d', type=str, default='cifar10',
                         choices=['cifar10', 'cifar100'],
-                        help='dataset choice')
-    parser.add_argument('--datadir', default='/home/leliy/datasets/cifar-100', type=str,
-                        help='path to dataset')
+                        help='dataset choice')                                      # 指定使用哪一个的 cifar 数据集
+    parser.add_argument('--datadir', default='/home/guobo/datasets/cifar-10', type=str,
+                        help='path to dataset')                                     # 指定数据集路径，如果本地没有，会联网下载到该路径                              
     parser.add_argument('--workers', default=4, type=int, metavar='N',
-                        help='number of data loading workers (default: 4 )')
+                        help='number of data loading workers (default: 4 )')        # 加载数据的线程数
     parser.add_argument('--epochs', default=200, type=int,
-                        help='number of total iterations (default: 64,000)')
+                        help='number of total iterations (default: 64,000)')        
     parser.add_argument('--start_epoch', default=0, type=int,
-                        help='manual iter number (useful on restarts)')
+                        help='manual iter number (useful on restarts)')             
     parser.add_argument('--batch_size', default=128, type=int,
-                        help='mini-batch size (default: 128)')
+                        help='mini-batch size (default: 128)')                      # 指定 batch
     parser.add_argument('--lr_schedule', default='piecewise', type=str,
-                        help='learning rate schedule')
-    parser.add_argument('--lr', default=0.1, type=float,
-                        help='initial learning rate')
+                        help='learning rate schedule')                              
+    parser.add_argument('--lr', default=0.1, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float,
-                        help='momentum')
+                        help='momentum')                                            # 动量
     parser.add_argument('--weight_decay', default=1e-4, type=float,
-                        help='weight decay (default: 1e-4)')
+                        help='weight decay (default: 1e-4)')                        # 权重衰减
     parser.add_argument('--print_freq', default=50, type=int,
-                        help='print frequency (default: 10)')
+                        help='print frequency (default: 10)')                       
     parser.add_argument('--resume', default='', type=str,
                         help='path to  latest checkpoint (default: None)')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true',
-                        help='use pretrained model')
+                        help='use pretrained model')                                # 使用预训练模型
     parser.add_argument('--save_folder', default='save_checkpoints',
                         type=str,
-                        help='folder to save the checkpoints')
-    parser.add_argument('--num_bits', default=0, type=int,
+                        help='folder to save the checkpoints')                      # 指定保存训练信息的文件夹，这个有个小问题，总是根据执行的路径来存放
+    parser.add_argument('--num_bits', default=8, type=int,
                         help='num bits for weight and activation')
-    parser.add_argument('--num_grad_bits', default=0, type=int,
-                        help='num bits for gradient')
+    parser.add_argument('--num_grad_bits', default=8, type=int,
+                        help='num bits for gradient')                               # 梯度的精度——比特数
     parser.add_argument('--debug', default=False, action='store_true',
-                        help='debug or not ')
+                        help='debug or not ')                                       
     args = parser.parse_args()
     return args
 
@@ -159,7 +158,7 @@ def main():
                         datefmt='%m-%d-%y %H:%M',
                         format='%(asctime)s:%(message)s',
                         handlers=handlers)
-
+    
     if args.cmd == 'train':
         logging.info('start training {}'.format(args.arch))
         run_training(args)
@@ -170,6 +169,8 @@ def main():
         test_model(args)
 
 def run_training(args):
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
     # create model
     # model = models.__dict__[args.arch](args.pretrained)
     model = models.__dict__[args.arch]()
@@ -212,8 +213,12 @@ def run_training(args):
     weight_params = get_weight_params(model)
     rest_params = get_rest_params(model)
 
-    optimizer = TripOptimizer(rest_params, weight_params, args.lr, 
-                            momentum=args.momentum, weight_decay=args.weight_decay)
+    # optimizer = TripOptimizer(rest_params, weight_params, args.lr)
+
+    optimizer = TripOptimizer(rest_params, weight_params, lr=0.1, momentum=0)
+    
+    # optimizer = TripOptimizer(rest_params, weight_params, args.lr, 
+    #                          momentum=args.momentum, weight_decay=args.weight_decay)
     
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[100, 150], last_epoch=args.start_epoch-1)
 
@@ -244,7 +249,7 @@ def run_training(args):
         start = time.time()
         train_prec1, train_loss, cr = train(args,train_loader,model, criterion, optimizer)
         validate_prec1, validate_loss = validate(args, test_loader, model, criterion, epoch)
-        optimizer.weight_update()
+        # optimizer.weight_update()
         lr_scheduler.step()
         if(train_loss < base_loss * rescaling_factor):
             base_loss = train_loss
@@ -275,6 +280,8 @@ def train(args, train_loader, model, criterion, optimizer):
 
     end = time.time()
     for batch_idx, (input, target) in enumerate(train_loader):
+        optimizer.set_momentum_exp(batch_idx) 
+
         # measuring data loading time
         data_time.update(time.time() - end)
 
@@ -296,8 +303,13 @@ def train(args, train_loader, model, criterion, optimizer):
 
         # compute gradient and do SGD step
         optimizer.zero_grad()
+        # optimizer.zero_grad_weight()
         loss.backward()
         optimizer.step()
+        optimizer.ret_momentum_exp()
+        if batch_idx == len(train_loader) - 1:
+            # optimizer.zero_momentum_buf()
+            optimizer.zero_grad_weight()
 
         # measure elapsed time
         batch_time.update(time.time() - end)

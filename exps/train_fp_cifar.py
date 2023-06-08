@@ -133,6 +133,8 @@ def main():
         test_model(args)
 
 def run_training(args):
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
     # create model
     # model = models.__dict__[args.arch](args.pretrained)
     model = models.__dict__[args.arch]()
