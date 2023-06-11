@@ -30,11 +30,6 @@ class TripOptimizer(Optimizer):
             raise ValueError("Nesterov momentum requires a momentum and zero dampening")
         super(TripOptimizer, self).__init__(params, defaults)
 
-        self.momentum_exp = 1
-        self.momentum_buf = []
-        self.beta = 0.9
-        self.eps = 1e-4
-
         self.weight_param_groups = []
         weight_param_groups = list(weight_params) 
         if len(weight_param_groups) == 0:
@@ -44,12 +39,6 @@ class TripOptimizer(Optimizer):
 
         for weight_param_group in weight_param_groups:
             self.add_weight_param_group(weight_param_group)
-
-    def set_momentum_exp(self, momenteum_exp):
-        self.momentum_exp = momenteum_exp
-    
-    def ret_momentum_exp(self):
-        self.momentum_exp = 1
 
     def __setstate__(self, state):
         super().__setstate__(state)
@@ -123,12 +112,7 @@ class TripOptimizer(Optimizer):
         loss = None
         if closure is not None:
             with torch.enable_grad():
-                loss = closure()
-
-        lr = 0
-        momentum = 0
-        dampening = 0 
-        nesterov = False      
+                loss = closure()    
 
         # 传统的梯度的更新，不需要额外的开销，不需要使用在权重中的更新    
         for group in self.param_groups:            
@@ -150,8 +134,6 @@ class TripOptimizer(Optimizer):
                     else:
                         momentum_buffer_list.append(state['momentum_buffer'])
 
-            # print("momentum_buffer_list_len: " + str(len(momentum_buffer_list)))
-            # print(momentum_buffer_list)
 
             sgd(params_with_grad,
                 d_p_list,
@@ -165,23 +147,12 @@ class TripOptimizer(Optimizer):
                 maximize=group['maximize'],
                 has_sparse_grad=has_sparse_grad,
                 foreach=group['foreach'])
-            
-            lr = group['lr']
-            momentum = group['momentum']
-            dampening = group['dampening']
-            nesterov = group['nesterov']
-            # momentum_buf = momentum_buffer_list
 
 
             # update momentum_buffers in state
             for p, momentum_buffer in zip(params_with_grad, momentum_buffer_list):
                 state = self.state[p]
                 state['momentum_buffer'] = momentum_buffer
-        
-        # if self.momenteum_exp == 5:
-        #     print("len_momenteum_list: " + str(len(momentum_buffer_list)))
-        #     for i in range(len(momentum_buffer_list)):
-        #         print(f"len_momenteum_list[{i}]: " + str(len(momentum_buffer_list[i])))
 
         for weight_group in self.weight_param_groups:
             grad_params = []
@@ -195,14 +166,7 @@ class TripOptimizer(Optimizer):
                 else:
                     grad_values.append(p.grad)
 
-            grad_update(grad_params, 
-                        grad_values, 
-                        self.momentum_buf,
-                        lr,
-                        momentum,
-                        dampening, 
-                        nesterov,
-                        self.momentum_exp)
+            grad_update(grad_params, grad_values)
 
         return loss
 
@@ -220,9 +184,6 @@ class TripOptimizer(Optimizer):
         #     for w_p in weight_group['params']:
         #         if w_p.grad is not None:
         #             w_p.grad.zero_()
-
-    def zero_momentum_buf(self):
-        self.momentum_buf.clear()
 
     @torch.no_grad()
     def weight_update(self):
@@ -267,13 +228,7 @@ class TripOptimizer(Optimizer):
                 grad_param.zero_()
 
 def grad_update(params: List[Tensor], 
-                grads: List[Tensor],
-                momentum_buf: List[Optional[Tensor]],
-                lr:float,
-                momentum: float,
-                dampening: float,  
-                nesterov: bool,              
-                momentum_exp):        
+                grads: List[Tensor]):        
     for i, param in enumerate(params):
         grad = grads[i]
 
@@ -320,7 +275,7 @@ def grad_update(params: List[Tensor],
         #     momentum_sum = momentum_buf[i]
         #     grad = momentum_sum.mul_(pow(momentum, momentum_exp))
 
-        param.add_(grad, alpha=lr)
+        param.add_(grad)
 
 def sgd(params: List[Tensor],
         d_p_list: List[Tensor],

@@ -249,7 +249,7 @@ def run_training(args):
         start = time.time()
         train_prec1, train_loss, cr = train(args,train_loader,model, criterion, optimizer)
         validate_prec1, validate_loss = validate(args, test_loader, model, criterion, epoch)
-        # optimizer.weight_update()
+        optimizer.weight_update()
         lr_scheduler.step()
         if(train_loss < base_loss * rescaling_factor):
             base_loss = train_loss
@@ -280,8 +280,6 @@ def train(args, train_loader, model, criterion, optimizer):
 
     end = time.time()
     for batch_idx, (input, target) in enumerate(train_loader):
-        optimizer.set_momentum_exp(batch_idx) 
-
         # measuring data loading time
         data_time.update(time.time() - end)
 
@@ -303,13 +301,10 @@ def train(args, train_loader, model, criterion, optimizer):
 
         # compute gradient and do SGD step
         optimizer.zero_grad()
-        # optimizer.zero_grad_weight()
         loss.backward()
         optimizer.step()
-        optimizer.ret_momentum_exp()
-        if batch_idx == len(train_loader) - 1:
-            # optimizer.zero_momentum_buf()
-            optimizer.zero_grad_weight()
+        # if batch_idx == len(train_loader) - 1:
+        #     optimizer.zero_grad_weight()
 
         # measure elapsed time
         batch_time.update(time.time() - end)

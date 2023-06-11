@@ -31,7 +31,7 @@ model_names = sorted(name for name in models.__dict__
 def parse_args():
     parser = argparse.ArgumentParser(
         description='PyTorch CIFAR training in a fixed-point low-precision way!')
-    parser.add_argument("--team_name", type=str,  default='leliy-ict')
+    parser.add_argument("--team_name", type=str,  default='guobo22')
     parser.add_argument("--project_name", type=str, default='trip')
     parser.add_argument("--experiment_name", type=str, default='')
     parser.add_argument("--scenario_name", type=str, default='')
@@ -45,7 +45,7 @@ def parse_args():
     parser.add_argument('--dataset', '-d', type=str, default='cifar10',
                         choices=['cifar10', 'cifar100'],
                         help='dataset choice')
-    parser.add_argument('--datadir', default='/home/leliy/datasets/cifar-100', type=str,
+    parser.add_argument('--datadir', default='/home/guobo/datasets/cifar-10', type=str,
                         help='path to dataset')
     parser.add_argument('--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4 )')
