@@ -5,6 +5,7 @@ from torch.optim.optimizer import Optimizer, required
 from typing import List, Optional, Type
 import warnings 
 from collections import defaultdict, abc as container_abcs
+import ipdb
 
 
 class TripOptimizer(Optimizer):
@@ -153,6 +154,8 @@ class TripOptimizer(Optimizer):
             for p, momentum_buffer in zip(params_with_grad, momentum_buffer_list):
                 state = self.state[p]
                 state['momentum_buffer'] = momentum_buffer
+
+        # ipdb.set_trace()
 
         for weight_group in self.weight_param_groups:
             grad_params = []

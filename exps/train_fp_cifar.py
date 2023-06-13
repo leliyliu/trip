@@ -124,7 +124,7 @@ def main():
                         handlers=handlers)
 
     if args.cmd == 'train':
-        logging.info('start training {}'.format(args.arch))
+        logging.info('start training {}:'.format(args.arch))
         run_training(args)
 
     elif args.cmd == 'test':
@@ -141,7 +141,13 @@ def run_training(args):
     # basemodel = copy.deepcopy(model)
     model = torch.nn.DataParallel(model).cuda()
 
-    print('SGD training')
+    # print('SGD training')
+    logging.info("Training messages:\r\n"
+                 "*********************************************************\r\n"
+                 "* Training Setting:                                     *\r\n"
+                 "*     1. nothing;                                       *\r\n"
+                 "* Methods: SGD 8+8;                                     *\r\n"
+                 "*********************************************************")
 
     wandb.watch(model, log="all")
     
@@ -203,6 +209,7 @@ def run_training(args):
     # 开始进行训练
     model.apply(disable_measure) # 开始进行正式的训练，将 measure 设置为 False
 
+    best_epoch = 0
     for epoch in range(args.epochs):
         start = time.time()
         train_prec1, train_loss, cr = train(args,train_loader,model, criterion, optimizer)
@@ -221,6 +228,12 @@ def run_training(args):
             print("Current Best Epoch: ", best_epoch)
             print("Current cr val: {}, cr avg: {}".format(cr.val, cr.avg))
 
+    logging.info("{0} training is over!\r\n"
+                 "*********************************************************\r\n"
+                 "*         Best Prec@: {1}, Best Epoch: {2}.           *\r\n"
+                 "*********************************************************"
+                 .format(args.arch, best_prec1, best_epoch))
+    
     wandb.save("wandb-{}-{}-{}.h5".format(args.arch, args.experiment_name, args.scenario_name))
 
 def train(args, train_loader, model, criterion, optimizer):
