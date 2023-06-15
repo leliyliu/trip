@@ -16,7 +16,8 @@ class TripOptimizer(Optimizer):
     """
 
     def __init__(self, params, weight_params, lr=required, momentum=0, dampening=0,
-                 weight_decay=0, nesterov=False, *, maximize=False, foreach: Optional[bool] = None):
+                 weight_decay=0, nesterov=False, *, maximize=False, 
+                 foreach: Optional[bool] = None, len_trainloader=0, zero_gr=0):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if momentum < 0.0:
@@ -40,6 +41,11 @@ class TripOptimizer(Optimizer):
 
         for weight_param_group in weight_param_groups:
             self.add_weight_param_group(weight_param_group)
+        
+        self.len_trainloader = len_trainloader
+        self.zero_grad_rate = zero_gr
+        self.zero_grad_count = 0 if self.len_trainloader == 0 else int(
+            self.len_trainloader * self.zero_grad_rate)
 
     def __setstate__(self, state):
         super().__setstate__(state)
@@ -141,7 +147,6 @@ class TripOptimizer(Optimizer):
                 momentum_buffer_list,
                 weight_decay=group['weight_decay'],
                 momentum=group['momentum'],
-                # momentum=0,
                 lr=group['lr'],
                 dampening=group['dampening'],
                 nesterov=group['nesterov'],
@@ -173,15 +178,20 @@ class TripOptimizer(Optimizer):
 
         return loss
 
-    def zero_grad_weight(self, set_to_none: bool = False):
-        for weight_group in self.weight_param_groups: 
-            if not isinstance(weight_group['params'], list):
-                raise TypeError('optimizer params need to be organized in ordered collections')
-            for index, p in enumerate(weight_group['params']):
-                if index % 2: # grad params 
-                    p.grad = None
-                else:
-                    p.grad.zero_()
+    def zero_grad2(self, set_to_none: bool = False):
+        if self.zero_grad_count > 1:
+            self.zero_grad_count = self.zero_grad_count - 1
+        else:
+            if self.len_trainloader > 0:
+                self.zero_grad_count = 0 if self.len_trainloader == 0 else int(
+                    self.len_trainloader * self.zero_grad_rate)
+            for weight_group in self.weight_param_groups: 
+                if not isinstance(weight_group['params'], list):
+                    raise TypeError('optimizer params need to be organized in ordered collections')
+                for index, p in enumerate(weight_group['params']):
+                    if index % 2 == 0: 
+                        p.grad.zero_()
+
         # for weight_group in self.weight_param_groups:            
 
         #     for w_p in weight_group['params']:
@@ -229,6 +239,9 @@ class TripOptimizer(Optimizer):
 
             for grad_param in grad_params:
                 grad_param.zero_()
+
+            # for weight_param in weight_params:
+            #     weight_param.grad.zero_()
 
 def grad_update(params: List[Tensor], 
                 grads: List[Tensor]):        

@@ -181,9 +181,12 @@ def run_training(args):
     logging.info("Training messages:\r\n"
                  "*********************************************************\r\n"
                  "* Training Setting:                                     *\r\n"
-                 "*     1. Without weight_update();                       *\r\n"
-                 "*     2. Customized zero_grad() in batch;               *\r\n"
-                 "*     3. zero_grad() executes one time every epoch;     *\r\n"
+                 "*     1. weight_update();                               *\r\n"
+                 "*     2. add zero_grad2();                              *\r\n"
+                 "*     3. zero_grad2() executes according to new         *\r\n"
+                 "*        parameters;                                    *\r\n"
+                 "*     4. zero_gr = 0;                                   *\r\n"
+                 "*     5. weight_decay=1e-3;                             *\r\n"
                  "* Methods: Trip with 8+8;                               *\r\n"
                  "*********************************************************")
 
@@ -223,7 +226,9 @@ def run_training(args):
 
     # optimizer = TripOptimizer(rest_params, weight_params, args.lr)
 
-    optimizer = TripOptimizer(rest_params, weight_params, lr=0.1, momentum=0)
+    optimizer = TripOptimizer(rest_params, weight_params, lr=0.1, momentum=0,
+                              len_trainloader=len(train_loader), zero_gr=0, 
+                              weight_decay=1e-3)
     
     # optimizer = TripOptimizer(rest_params, weight_params, args.lr, 
     #                          momentum=args.momentum, weight_decay=args.weight_decay)
@@ -277,9 +282,9 @@ def run_training(args):
             print("Current Best Epoch: ", best_epoch)
             print("Current cr val: {}, cr avg: {}".format(cr.val, cr.avg))
 
-    logging.info("{0} training is over!\r\n"
+    logging.info("{} training is over!\r\n"
                  "*********************************************************\r\n"
-                 "*         Best Prec@: {1}, Best Epoch: {2}.           *\r\n"
+                 "*         Best Prec@: {:.2f}, Best Epoch: {:0>3}.           *\r\n"
                  "*********************************************************"
                  .format(args.arch, best_prec1, best_epoch))
     
@@ -315,11 +320,12 @@ def train(args, train_loader, model, criterion, optimizer):
         top1.update(prec1.item(), input.size(0))
 
         # compute gradient and do SGD step
-        optimizer.zero_grad()
+        optimizer.zero_grad()        
         loss.backward()
         optimizer.step()
+        optimizer.zero_grad2()
         # if batch_idx == len(train_loader) - 1:
-        #     optimizer.zero_grad_weight()
+        #     optimizer.zero_grad2()
 
         # measure elapsed time
         batch_time.update(time.time() - end)

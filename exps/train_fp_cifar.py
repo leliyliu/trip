@@ -228,9 +228,9 @@ def run_training(args):
             print("Current Best Epoch: ", best_epoch)
             print("Current cr val: {}, cr avg: {}".format(cr.val, cr.avg))
 
-    logging.info("{0} training is over!\r\n"
+    logging.info("{} training is over!\r\n"
                  "*********************************************************\r\n"
-                 "*         Best Prec@: {1}, Best Epoch: {2}.           *\r\n"
+                 "*         Best Prec@: {:.2f}, Best Epoch: {:0>3}.           *\r\n"
                  "*********************************************************"
                  .format(args.arch, best_prec1, best_epoch))
     
