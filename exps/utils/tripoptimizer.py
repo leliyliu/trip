@@ -163,8 +163,10 @@ class TripOptimizer(Optimizer):
         # ipdb.set_trace()
 
         for weight_group in self.weight_param_groups:
+            weight_params = []
             grad_params = []
             grad_values = [] 
+            momentum_buffer_list = []
 
             if not isinstance(weight_group['params'], list):
                 raise TypeError('optimizer params need to be organized in ordered collections')
@@ -173,30 +175,45 @@ class TripOptimizer(Optimizer):
                     grad_params.append(p)
                 else:
                     grad_values.append(p.grad)
+                    # weight_params.append(p)
+                    state = self.state[p.grad]
+                    if 'momentum_buffer2' not in state:
+                        momentum_buffer_list.append(None)
+                    else:
+                        momentum_buffer_list.append(state['momentum_buffer2'])
 
-            grad_update(grad_params, grad_values)
+            grad_update(params=grad_params, 
+                        grads=grad_values,
+                        momentum_buffer_list=momentum_buffer_list,
+                        momentum=weight_group['momentum'],
+                        lr=weight_group['lr'])
+
+            for p, momentum_buffer in zip(grad_values, momentum_buffer_list):
+                state = self.state[p]
+                state['momentum_buffer2'] = momentum_buffer
 
         return loss
 
     def zero_grad2(self, set_to_none: bool = False):
-        if self.zero_grad_count > 1:
-            self.zero_grad_count = self.zero_grad_count - 1
-        else:
-            if self.len_trainloader > 0:
-                self.zero_grad_count = 0 if self.len_trainloader == 0 else int(
-                    self.len_trainloader * self.zero_grad_rate)
-            for weight_group in self.weight_param_groups: 
-                if not isinstance(weight_group['params'], list):
-                    raise TypeError('optimizer params need to be organized in ordered collections')
-                for index, p in enumerate(weight_group['params']):
-                    if index % 2 == 0: 
-                        p.grad.zero_()
+        # if self.zero_grad_count > 1:
+        #     self.zero_grad_count = self.zero_grad_count - 1
+        # else:
+        #     if self.len_trainloader > 0:
+        #         self.zero_grad_count = 0 if self.len_trainloader == 0 else int(
+        #             self.len_trainloader * self.zero_grad_rate)
+        #     for weight_group in self.weight_param_groups: 
+        #         if not isinstance(weight_group['params'], list):
+        #             raise TypeError('optimizer params need to be organized in ordered collections')
+        #         for index, p in enumerate(weight_group['params']):
+        #             if index % 2 == 0: 
+        #                 p.grad.zero_()
 
-        # for weight_group in self.weight_param_groups:            
-
-        #     for w_p in weight_group['params']:
-        #         if w_p.grad is not None:
-        #             w_p.grad.zero_()
+        for weight_group in self.weight_param_groups: 
+            if not isinstance(weight_group['params'], list):
+                raise TypeError('optimizer params need to be organized in ordered collections')
+            for index, p in enumerate(weight_group['params']):
+                if index % 2 == 0: 
+                    p.grad.zero_()
 
     @torch.no_grad()
     def weight_update(self):
@@ -214,27 +231,33 @@ class TripOptimizer(Optimizer):
                 else:
                     weight_params.append(p)
                     state = self.state[p]
-                    if 'momentum_buffer' not in state:
+                    if 'momentum_buffer3' not in state:
                         momentum_buffer_list.append(None)
                     else:
-                        momentum_buffer_list.append(state['momentum_buffer'])
+                        momentum_buffer_list.append(state['momentum_buffer3'])
 
-            sgd(weight_params, 
-                grad_params, 
-                momentum_buffer_list,
-                weight_decay=weight_group['weight_decay'],
-                momentum=weight_group['momentum'],
-                lr=weight_group['lr'],
-                dampening=weight_group['dampening'],
-                nesterov=weight_group['nesterov'],
-                maximize=weight_group['maximize'],
-                has_sparse_grad=has_sparse_grad,
-                foreach=weight_group['foreach'])
+            # sgd(weight_params, 
+            #     grad_params, 
+            #     momentum_buffer_list,
+            #     weight_decay=weight_group['weight_decay'],
+            #     momentum=weight_group['momentum'],
+            #     lr=weight_group['lr'],
+            #     dampening=weight_group['dampening'],
+            #     nesterov=weight_group['nesterov'],
+            #     maximize=weight_group['maximize'],
+            #     has_sparse_grad=has_sparse_grad,
+            #     foreach=weight_group['foreach'])
+
+            update_grad2weight(weight_params=weight_params, 
+                               weight_grads=grad_params,
+                               momentum_buffer_list=momentum_buffer_list,
+                               momentum=weight_group['momentum'],
+                               lr=weight_group['lr'])
             
             # update momentum_buffers in state
             for p, momentum_buffer in zip(weight_params, momentum_buffer_list):
                 state = self.state[p]
-                state['momentum_buffer'] = momentum_buffer
+                state['momentum_buffer3'] = momentum_buffer
 
 
             for grad_param in grad_params:
@@ -243,8 +266,35 @@ class TripOptimizer(Optimizer):
             # for weight_param in weight_params:
             #     weight_param.grad.zero_()
 
+def update_grad2weight(weight_params: List[Tensor], 
+                       weight_grads: List[Tensor],
+                       momentum_buffer_list: List[Optional[Tensor]],
+                        # weight_decay=weight_decay,
+                       momentum:float,
+                       lr:float):
+    for i, param in enumerate(weight_params):
+        grad = weight_grads[i]
+        # grad = grad.add(param, alpha=0.01)
+
+        # if momentum != 0:
+        #     buf = momentum_buffer_list[i]
+
+        #     if buf is None:
+        #         buf = torch.clone(grad).detach()
+        #         momentum_buffer_list[i] = buf
+        #     else:
+        #         buf.mul_(momentum).add_(grad)
+            
+        #     grad = buf
+
+        param.add_(grad, alpha=-lr)
+
 def grad_update(params: List[Tensor], 
-                grads: List[Tensor]):        
+                grads: List[Tensor],
+                momentum_buffer_list: List[Optional[Tensor]],
+                # weight_decay=weight_decay,
+                momentum:float,
+                lr:float):        
     for i, param in enumerate(params):
         grad = grads[i]
 
@@ -270,15 +320,16 @@ def grad_update(params: List[Tensor],
 
         # grad = grad.reshape(origin_shape)
         
-        # if momentum != 0:
+        if momentum != 0:
+            buf = momentum_buffer_list[i]
 
-        #     if len(momentum_buf) < len(params):
-        #         momentum_buf.append(grad)
-        #     else:
-        #         (momentum_buf[i]).mul_(momentum).add_(grad, alpha=1 - dampening)
-
-        # if len(momentum_buf) > i:
-        #     grad = momentum_buf[i]
+            if buf is None:
+                buf = torch.clone(grad).detach()
+                momentum_buffer_list[i] = buf
+            else:
+                buf.mul_(momentum).add_(grad)
+            
+            grad = buf
 
         # if momentum != 0:
         #     if len(momentum_buf) < len(params):

@@ -1,0 +1,369 @@
+{
+    "os": "Linux-5.19.0-42-generic-x86_64-with-debian-bookworm-sid",
+    "python": "3.7.15",
+    "heartbeatAt": "2023-06-21T04:00:02.106135",
+    "startedAt": "2023-06-21T03:59:59.810568",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/guobo/projects/trip/exps/train_with_cifar.py",
+    "codePath": "exps/train_with_cifar.py",
+    "git": {
+        "remote": "git@github.com:leliyliu/trip.git",
+        "commit": "817cf54831c7e188e73b7351ff8e36d2fe0f80fb"
+    },
+    "email": "gblvso@163.com",
+    "root": "/home/guobo/projects/trip",
+    "host": "dell",
+    "username": "guobo",
+    "executable": "/home/guobo/env/anaconda3/envs/trip/bin/python",
+    "cpu_count": 32,
+    "cpu_count_logical": 64,
+    "cpu_freq": {
+        "current": 2167.84853125,
+        "min": 800.0,
+        "max": 3200.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2389.237,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2348.454,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2429.459,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2389.227,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2422.666,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2697.149,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2381.686,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2328.495,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2704.429,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2479.635,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 1600.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2699.906,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2302.196,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 1683.096,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2676.349,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2339.104,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 1619.977,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2699.995,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2382.037,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2598.152,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2404.736,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2476.173,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2376.742,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2357.503,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 3200.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2373.04,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2300.036,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2492.23,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2299.946,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2199.882,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2476.506,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2704.021,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2481.428,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2397.505,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2372.151,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2364.457,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2402.76,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2479.623,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2699.468,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2553.856,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2362.705,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 1914.712,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2360.795,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2352.157,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2603.106,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2699.993,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2603.333,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2394.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2477.011,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2359.737,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 1400.0,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2700.131,
+            "min": 800.0,
+            "max": 3200.0
+        },
+        {
+            "current": 2699.936,
+            "min": 800.0,
+            "max": 3200.0
+        }
+    ],
+    "disk": {
+        "total": 877.729305267334,
+        "used": 803.7594451904297
+    },
+    "gpu": "NVIDIA A100 80GB PCIe",
+    "gpu_count": 2,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA A100 80GB PCIe",
+            "memory_total": 85899345920
+        },
+        {
+            "name": "NVIDIA A100 80GB PCIe",
+            "memory_total": 85899345920
+        }
+    ],
+    "memory": {
+        "total": 503.1094627380371
+    }
+}

@@ -169,7 +169,7 @@ def main():
         test_model(args)
 
 def run_training(args):
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     # create model
     # model = models.__dict__[args.arch](args.pretrained)
@@ -181,12 +181,12 @@ def run_training(args):
     logging.info("Training messages:\r\n"
                  "*********************************************************\r\n"
                  "* Training Setting:                                     *\r\n"
-                 "*     1. weight_update();                               *\r\n"
-                 "*     2. add zero_grad2();                              *\r\n"
-                 "*     3. zero_grad2() executes according to new         *\r\n"
-                 "*        parameters;                                    *\r\n"
-                 "*     4. zero_gr = 0;                                   *\r\n"
-                 "*     5. weight_decay=1e-3;                             *\r\n"
+                 "*     1. weight_update() executes one time every        *\r\n"
+                 "*        epoch;                                         *\r\n"
+                 "*     2. zero_grad2() executes every batch;             *\r\n"
+                 "*     3. lr = 0.1;                                      *\r\n"
+                 "*     4. grad_update() adds momentum, momentum = 0.9;   *\r\n"
+                 "*     5. num_bits = num_grad_bits = 10;                 *\r\n"
                  "* Methods: Trip with 8+8;                               *\r\n"
                  "*********************************************************")
 
@@ -226,9 +226,7 @@ def run_training(args):
 
     # optimizer = TripOptimizer(rest_params, weight_params, args.lr)
 
-    optimizer = TripOptimizer(rest_params, weight_params, lr=0.1, momentum=0,
-                              len_trainloader=len(train_loader), zero_gr=0, 
-                              weight_decay=1e-3)
+    optimizer = TripOptimizer(rest_params, weight_params, lr=0.1, momentum=0.9)
     
     # optimizer = TripOptimizer(rest_params, weight_params, args.lr, 
     #                          momentum=args.momentum, weight_decay=args.weight_decay)
@@ -260,9 +258,19 @@ def run_training(args):
     
     best_epoch = 0
     for epoch in range(args.epochs):
+        lr = 0.1
+        # if epoch < 100:
+        #     lr = 0.1
+        # elif epoch < 150:
+        #     lr = 0.01
+        # else:
+        #     lr = 0.001
+
         start = time.time()
-        train_prec1, train_loss, cr = train(args,train_loader,model, criterion, optimizer)
-        validate_prec1, validate_loss = validate(args, test_loader, model, criterion, epoch)
+        train_prec1, train_loss, cr = train(args,train_loader,model, criterion, optimizer, lr)
+        validate_prec1, validate_loss = validate(args, test_loader, model, criterion, epoch, lr)
+        # if epoch % 50 == 0:
+        #     optimizer.weight_update()
         optimizer.weight_update()
         lr_scheduler.step()
         if(train_loss < base_loss * rescaling_factor):
@@ -290,7 +298,7 @@ def run_training(args):
     
     wandb.save("wandb-{}-{}-{}.h5".format(args.arch, args.experiment_name, args.scenario_name))
 
-def train(args, train_loader, model, criterion, optimizer):
+def train(args, train_loader, model, criterion, optimizer, lr):  
     model.train()
     batch_time = AverageMeter()
     data_time = AverageMeter()
@@ -320,10 +328,10 @@ def train(args, train_loader, model, criterion, optimizer):
         top1.update(prec1.item(), input.size(0))
 
         # compute gradient and do SGD step
-        optimizer.zero_grad()        
+        optimizer.zero_grad()     
+        optimizer.zero_grad2()   
         loss.backward()
         optimizer.step()
-        optimizer.zero_grad2()
         # if batch_idx == len(train_loader) - 1:
         #     optimizer.zero_grad2()
 
@@ -352,7 +360,7 @@ def train(args, train_loader, model, criterion, optimizer):
 
     return top1.avg, losses.avg, cr
 
-def validate(args, test_loader, model, criterion, step):
+def validate(args, test_loader, model, criterion, step, lr):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
